@@ -23,3 +23,9 @@ authRoute.post('/login',
         res.sendStatus(StatusCode.NoContent_204)
     }
 )
+
+
+authRoute.get('/me',
+
+
+)
