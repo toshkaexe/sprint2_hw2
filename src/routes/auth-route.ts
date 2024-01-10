@@ -3,7 +3,7 @@ import {StatusCode} from "../models/common";
 import {blogsCollection, postsCollection} from "../db/db";
 import {WithId} from "mongodb";
 import {UserDbModel} from "../models/users/users-models";
-import {usersService} from "../domain/users-service";
+import {UsersService} from "../domain/users-service";
 
 export const authRoute = Router({})
 
@@ -11,7 +11,7 @@ authRoute.post('/login',
 
     async (req: Request, res: Response): Promise<void>  => {
         const user: WithId<UserDbModel> | null  = await
-            usersService.checkCredentials(req.body)
+            UsersService.checkCredentials(req.body)
         console.log("-------------------------------")
         console.log(user)
 

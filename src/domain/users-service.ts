@@ -4,16 +4,16 @@ import {CreateUserInputModel, UserDbModel, userMapper, UserOutputModel} from "..
 import {UsersRepository} from "../repositories/users-repositiory";
 import {LoginInputModel} from "../models/login-model";
 
-export const usersService = {
+export class UsersService {
 
-    async findUserById(userId: ObjectId | null) {
+    static async findUserById(userId: ObjectId | null) {
         const user = await UsersRepository.findUserById(userId!)
         if (!user) return null
         return userMapper(user)
 
-    },
+    }
 
-    async createUser(body: CreateUserInputModel): Promise<UserOutputModel> {
+    static async createUser(body: CreateUserInputModel): Promise<UserOutputModel> {
         const passwordHash = await bcrypt.hash(body.password, 10)
         const newUser: UserDbModel = {
             login: body.login,
@@ -22,13 +22,13 @@ export const usersService = {
             createdAt: new Date().toISOString(),
         }
         return UsersRepository.createUser(newUser)
-    },
+    }
 
-    async deleteUser(id: string): Promise<boolean> {
+    static async deleteUser(id: string): Promise<boolean> {
         return UsersRepository.deleteUser(id)
-    },
+    }
 
-    async checkCredentials(body: LoginInputModel) {
+    static async checkCredentials(body: LoginInputModel) {
         const user: WithId<UserDbModel> | null = await UsersRepository.findByLoginOrEmail(body.loginOrEmail)
         if (!user) return null
         const compare = await bcrypt.compare(body.password, user.password)
@@ -36,5 +36,5 @@ export const usersService = {
             return user
         }
         return null
-    },
+    }
 }
