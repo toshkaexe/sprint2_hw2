@@ -4,7 +4,7 @@ import {StatusCode} from "../models/common";
 import {authMiddleware} from "../middleware/auth-middlewares";
 import {UsersQueryRepository} from "../repositories/user-query-repository";
 import {UsersService} from "../domain/users-service";
-import {validateUsers} from "../validators/auth-validation";
+import {validateUsers} from "../validators/user-validation";
 import {inputValidation} from "../validators/input-validation";
 
 export const usersRouter = Router({})
