@@ -14,7 +14,8 @@ export const db: DBType = {
 const port = 80;
 
 const uri =  process.env.MONGO_URI_CLOUD
-    || process.env.MONGO_URI_LOCAL  ||'mongo://localhost:27017';
+    || process.env.MONGO_URI_LOCAL  || 'mongodb+srv://antonzeltser:admin@cluster0.rmbeaqk.mongodb.net/'
+    //'mongo://localhost:27017';
 
 
 console.log("url: ", uri);

@@ -16,12 +16,14 @@ export const authMiddleware = (req: Request,
 
     const auth = req.headers['authorization']
     if (!auth) {
+
         res.sendStatus(StatusCode.NOT_AUTHORIZED_401)
         return
     }
 
     const [basic, token] = auth.split(" ")
     if (basic !== 'Basic') {
+
         res.sendStatus(StatusCode.NOT_AUTHORIZED_401)
         return
     }
@@ -30,6 +32,7 @@ export const authMiddleware = (req: Request,
     const [login, password] = decodedData.split(":")
 
     if (login !== process.env.AUTH_LOGIN || password !== process.env.AUTH_PASSWORD) {
+        console.log("working!!")
         res.sendStatus(StatusCode.NOT_AUTHORIZED_401)
         return
 
@@ -54,7 +57,7 @@ export const bearerAuth = async (req: Request, res: Response, next: NextFunction
 
     const user: UserOutputModel | null = await UsersService.findUserById(userId)
     if (user) {
-        //req.user = user
+        req.user = user
         return next()
     }
     console.log('not user')

@@ -2,14 +2,14 @@ import {CommentDbModel, commentMapper, CommentOutputModel} from "../models/comme
 import {InsertOneResult, ObjectId} from "mongodb";
 import {commentsCollection} from "../db/db";
 
-export const commentsRepository = {
+export class commentsRepository  {
 
-    async createComment(newComment: CommentDbModel): Promise<CommentOutputModel> {
+    static async createComment(newComment: CommentDbModel): Promise<CommentOutputModel> {
         const result: InsertOneResult<CommentDbModel> = await commentsCollection.insertOne({...newComment})
         return commentMapper({_id: result.insertedId, ...newComment})
-    },
+    }
 
-    async updateComment(id: string, body: any): Promise<any> {
+    static async updateComment(id: string, body: any): Promise<any> {
         if(!ObjectId.isValid(id)) return false
         const result = await commentsCollection.updateOne({_id: new ObjectId(id)}, {
             $set: {
@@ -17,16 +17,16 @@ export const commentsRepository = {
             }
         })
         return result.matchedCount === 1
-    },
+    }
 
-    async deleteComment(id: string): Promise<boolean> {
+    static async deleteComment(id: string): Promise<boolean> {
         if(!ObjectId.isValid(id)) return false
         const result = await commentsCollection.deleteOne({_id: new ObjectId(id)})
         return result.deletedCount === 1
-    },
+    }
 
-    async deleteAll() {
+    static async deleteAll() {
         return  await commentsCollection.deleteMany({})
-    },
+    }
 
 }

@@ -1,6 +1,6 @@
 import {Router, Request, Response} from 'express';
 import {BlogRepository} from "../repositories/blog-repository";
-import {authMiddleware} from "../middleware/auth-middlewares";
+import {authMiddleware, bearerAuth} from "../middleware/auth-middlewares";
 import {blogValidation, blogValidationPostToBlog, nameValidation} from "../validators/blog-validation";
 import {randomUUID} from "crypto";
 import {db} from '../db/db'
@@ -19,6 +19,7 @@ import {PostsQueryRepository} from "../repositories/posts-query-repository";
 export const blogRoute = Router({})
 
 blogRoute.get('/',
+
     async (req: Request, res: Response): Promise<void> => {
         const { pageNumber, pageSize, sortBy, sortDirection } = getPageOptions(req.query);
         const searchNameTerm = req.query.searchNameTerm ? req.query.searchNameTerm.toString() : null
@@ -32,6 +33,7 @@ blogRoute.get('/',
 
 
 blogRoute.get('/:blogId',
+
     async (req: Request, res: Response): Promise<void> => {
         const foundBlog: OutputBlogModel | null = await BlogsQueryRepository.findBlogById(req.params.blogId)
         foundBlog ? res.status(StatusCode.OK_200).send(foundBlog) : res.sendStatus(StatusCode.NOT_FOUND_404)
@@ -39,6 +41,7 @@ blogRoute.get('/:blogId',
     })
 
 blogRoute.get('/:blogId/posts',
+
     async (req: Request, res: Response): Promise<void> => {
         const foundBlog: OutputBlogModel | null =
             await BlogsQueryRepository.findBlogById(req.params.blogId)
@@ -59,11 +62,13 @@ blogRoute.get('/:blogId/posts',
 
 blogRoute.post('/',
     authMiddleware,
+  //  bearerAuth,
     blogValidation(),
     async (req: Request, res: Response): Promise<void> => {
         const newBlog = await BlogService.createBlog(req.body)
         res.status(StatusCode.CREATED_201).send(newBlog)
     })
+
 // create post for specified blog
 blogRoute.post('/:blogId/posts',
     authMiddleware,

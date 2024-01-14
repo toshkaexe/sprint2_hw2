@@ -21,7 +21,7 @@ commentsRoute.put('/:commentsId',
     async (req: Request, res: Response) => {
 
         const commentId = req.params.commentId
-        const isUpdated = await commentsService.updateComment(commentId, req.body)
+        const isUpdated = await commentsService.UpdateComment(commentId, req.body)
         isUpdated ? res.sendStatus(StatusCode.NoContent_204) :
             res.sendStatus(StatusCode.NOT_FOUND_404)
     })
@@ -32,7 +32,7 @@ commentsRoute.put('/:commentsId',
 commentsRoute.delete('/:commentsId',
     authMiddleware,
     async (req: Request, res: Response) => {
-        const isDeleted = await commentsService.deleteComment(req.params.commentId)
+        const isDeleted = await commentsService.DeleteCommentById(req.params.commentId)
         isDeleted ? res.sendStatus(StatusCode.NoContent_204) :
             res.sendStatus(StatusCode.NOT_FOUND_404)}
 

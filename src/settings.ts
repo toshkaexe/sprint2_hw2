@@ -6,6 +6,7 @@ import morganBody from "morgan-body";
 import bodyParser from "body-parser";
 import {authRoute} from "./routes/auth-route";
 import {usersRouter} from "./routes/users-route";
+import {commentsRoute} from "./routes/comments-route";
 
 export const app: Express = express();
 morganBody(app);
@@ -27,3 +28,4 @@ app.use('/testing', testingRoute)
 
 app.use('/auth', authRoute)
 app.use('/users', usersRouter)
+app.use('/comments', commentsRoute)
