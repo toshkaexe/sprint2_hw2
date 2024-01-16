@@ -20,8 +20,14 @@ export class commentsRepository  {
     }
 
     static async deleteComment(id: string): Promise<boolean> {
-        if(!ObjectId.isValid(id)) return false
+        console.log("11111111111111-1111111-------")
+        //
+       if(!ObjectId.isValid(id)) return false
+
+        console.log("11111111111111-1111111")
+        console.log(id)
         const result = await commentsCollection.deleteOne({_id: new ObjectId(id)})
+
         return result.deletedCount === 1
     }
 

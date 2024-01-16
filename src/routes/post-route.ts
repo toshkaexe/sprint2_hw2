@@ -22,6 +22,11 @@ import {PostsQueryRepository} from "../repositories/posts-query-repository";
 import {PostsService} from "../domain/posts-service";
 import {BlogsQueryRepository} from "../repositories/blogs-query-repository";
 import {OutputBlogModel} from "../models/blogs/blog-models";
+import {commentsQueryRepository} from "../repositories/comments-query-repository";
+import {CommentsService} from "../domain/comments-service";
+import {CommentOutputModel} from "../models/comments/comment-model";
+import {validateComments, validateContents} from "../validators/comments-validation";
+import {validateMongoId} from "../validators/validate-mongodb";
 
 export const postRoute = Router({})
 
@@ -35,7 +40,7 @@ postRoute.get('/', async (req: Request, res: Response) => {
 })
 
 postRoute.post('/',
-    bearerAuth,
+    authMiddleware,
     postValidation(),
     async (req: Request, res: Response) => {
         const newPostId = await PostsService.createPost(req.body)
@@ -54,7 +59,7 @@ postRoute.get('/:postId', async (req: Request, res: Response) => {
 })
 //put
 postRoute.put('/:postId',
-    bearerAuth,
+    authMiddleware,
     postValidation(),
     //inputValidationMiddleware,
     async (req: Request, res: Response) => {
@@ -82,3 +87,45 @@ postRoute.delete('/:postId',
         const isDeleted = await PostsService.deletePost(req.params.postId)
         isDeleted ? res.sendStatus(StatusCode.NoContent_204) : res.sendStatus(StatusCode.NOT_FOUND_404)
     })
+
+
+postRoute.get('/:postId/comments',
+    validateMongoId(),
+    async (req: Request, res: Response): Promise<void> => {
+        const postId = req.params.postId
+        const foundPost: OutputPostModel | null = await PostsQueryRepository.findPostById(postId)
+        if (!foundPost) {
+            res.sendStatus(StatusCode.NOT_FOUND_404)
+            return
+        }
+
+        const { pageNumber, pageSize, sortBy, sortDirection } = getPageOptions(req.query);
+        const comments =
+            await commentsQueryRepository.getCommentsForPost(req.params.postId, pageNumber, pageSize, sortBy, sortDirection)
+        if (!comments) {
+            res.sendStatus(StatusCode.NOT_FOUND_404)
+            return
+        }
+        res.send(comments)
+    })
+
+// добавляем новый коммент
+postRoute.post('/:postId/comments',
+    bearerAuth,
+
+    validateContents(),
+    async (req: Request, res: Response) => {
+        const {id: userId, login: userLogin} = req.user!
+        const postId = req.params.postId
+        const content = req.body.content
+
+        console.log(postId, 'its post id')
+
+        const newComment: CommentOutputModel | null =
+            await CommentsService.CreateComment({userId, userLogin}, postId, content)
+        if (!newComment) {
+            return res.sendStatus(StatusCode.NOT_FOUND_404)
+        }
+        return res.status(StatusCode.CREATED_201).send(newComment)
+    }
+)

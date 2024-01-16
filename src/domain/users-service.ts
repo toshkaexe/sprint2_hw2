@@ -2,7 +2,8 @@ import bcrypt from "bcrypt";
 import {ObjectId, WithId} from "mongodb";
 import {CreateUserInputModel, UserDbModel, userMapper, UserOutputModel} from "../models/users/users-models";
 import {UsersRepository} from "../repositories/users-repositiory";
-import {LoginInputModel} from "../models/login-model";
+import {LoginInputModel} from "../models/auth/login-model";
+
 
 export class UsersService {
 

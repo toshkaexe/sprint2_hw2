@@ -30,20 +30,19 @@ export const authMiddleware = (req: Request,
     const decodedData = Buffer.from(token, 'base64').toString()
     //admin:qwerty
     const [login, password] = decodedData.split(":")
-
     if (login !== process.env.AUTH_LOGIN || password !== process.env.AUTH_PASSWORD) {
         console.log("working!!")
         res.sendStatus(StatusCode.NOT_AUTHORIZED_401)
         return
-
     }
     return next();
-
 }
 
 
 
-export const bearerAuth = async (req: Request, res: Response, next: NextFunction) => {
+export const bearerAuth = async (req: Request,
+                                 res: Response,
+                                 next: NextFunction) => {
     const auth = req.headers['authorization']
     if (!auth) {
         return res.send(StatusCode.NOT_AUTHORIZED_401)

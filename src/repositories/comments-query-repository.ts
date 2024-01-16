@@ -1,4 +1,4 @@
-import {CommentDbModel, commentMapper} from "../models/comments/comment-model";
+import {CommentatorInfo, CommentDbModel, commentMapper} from "../models/comments/comment-model";
 import {commentsCollection} from "../db/db";
 import {ObjectId, WithId} from "mongodb";
 
@@ -34,10 +34,10 @@ export const commentsQueryRepository = {
             .limit(+pageSize)
             .skip(scip)
             .toArray();
-
+console.log(comments)
         return comments ? {
             pagesCount,
-            pageNumber,
+            page: pageNumber,
             pageSize,
             totalCount,
             items: comments.map(commentMapper)

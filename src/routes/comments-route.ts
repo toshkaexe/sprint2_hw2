@@ -1,51 +1,52 @@
 import {Router, Request, Response} from 'express';
 import {StatusCode} from "../models/common";
-import {blogsCollection, postsCollection} from "../db/db";
-import {WithId} from "mongodb";
-import {UserDbModel} from "../models/users/users-models";
-import {UsersService} from "../domain/users-service";
+
 import {CommentOutputModel} from "../models/comments/comment-model";
-import {commentsRepository} from "../repositories/comments-repository";
+
 import {commentsQueryRepository} from "../repositories/comments-query-repository";
-import {authMiddleware} from "../middleware/auth-middlewares";
-import {validateComments} from "../validators/comments-validation";
-import {commentsService} from "../domain/comments-service";
+import {bearerAuth} from "../middleware/auth-middlewares";
+import {validateComments, validateContents} from "../validators/comments-validation";
+import {CommentsService} from "../domain/comments-service";
+
 
 export const commentsRoute = Router({})
 
-commentsRoute.put('/:commentsId',
-    authMiddleware,
-    validateComments(),
-   // inputValidationMiddleware,
-  //  ownerMiddlevare,
+commentsRoute.put('/:commentId',
+    bearerAuth,
+    validateContents(),
     async (req: Request, res: Response) => {
 
         const commentId = req.params.commentId
-        const isUpdated = await commentsService.UpdateComment(commentId, req.body)
-        isUpdated ? res.sendStatus(StatusCode.NoContent_204) :
-            res.sendStatus(StatusCode.NOT_FOUND_404)
+        const isUpdated = await CommentsService.UpdateComment(commentId, req.body, req.user!.id)
+
+        if (isUpdated === false) return res.sendStatus(StatusCode.Forbidden_403);
+        if ( !isUpdated) return res.sendStatus(StatusCode.NOT_FOUND_404)
+        return res.sendStatus(StatusCode.NoContent_204);
+
     })
 
+commentsRoute.delete('/:commentId',
 
+    bearerAuth,
 
-
-commentsRoute.delete('/:commentsId',
-    authMiddleware,
     async (req: Request, res: Response) => {
-        const isDeleted = await commentsService.DeleteCommentById(req.params.commentId)
-        isDeleted ? res.sendStatus(StatusCode.NoContent_204) :
-            res.sendStatus(StatusCode.NOT_FOUND_404)}
+        const commentId = req.params.commentId
+        const isDeleted = await CommentsService.DeleteCommentById(req.params.commentId, req.user!.id)
 
+        if (isDeleted === false) return res.sendStatus(StatusCode.Forbidden_403);
+        if ( !isDeleted) return res.sendStatus(StatusCode.NOT_FOUND_404)
+        return res.sendStatus(StatusCode.NoContent_204);
+
+
+    }
 )
 
 
 commentsRoute.get('/:commentId',
-    authMiddleware,
+    // authMiddleware,
     async (req: Request, res: Response) => {
         const foundComment: CommentOutputModel | null = await commentsQueryRepository.getCommentById(req.params.commentId)
         foundComment ? res.status(StatusCode.OK_200).send(foundComment) :
             res.sendStatus(StatusCode.NOT_FOUND_404)
     }
-
-
 )
